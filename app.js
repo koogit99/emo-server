@@ -2,12 +2,14 @@
  * Node.js Resful API Frameworks
  * Express: Express는 웹 및 모바일 애플리케이션을 위한 강력한 기능 세트를 제공하는 Node.js용 미니멀리스트 웹 프레임워크
  * CORS란 자신이 속하지 않은 다른 도메인, 다른 프로토콜, 혹은 다른 포트에 있는 리소스를 요청하는 cross-origin HTTP 요청 방식
- * app.js 파일 생성
+ * node.js 설치 (node -v)
+ * emo-server 폴더 생성
+ * emo-server 폴더 안에서 app.js 파일 생성
  * npm init
  * npm install express
  * npm install mysql
- * * npm install http
- * * npm install cors
+ * npm install http
+ * npm install cors
  * npm install http express cors mysql : 한방에 설치 가능
  * 
  * node 실행 : node app.js
@@ -55,7 +57,7 @@ app.get('/api/users/:username', async (req, res) => {
   // let { username, password } = req.params; // 요청 파라미터 중에서 username, password 변수 선언
   // const sql = `select * from t_user where username = '${username}' and password = '${password}'`;
 
-    let { username } = req.params;  // 요청 파라미터 중에서 username 변수 선언
+  let { username } = req.params;  // 요청 파라미터 중에서 username 변수 선언
   
   const sql = `select * from t_user where username = '${username}'`; // 백틱(`)을 사용하면 문자열 안에 변수를 넣을 수 있음
   maria.query(sql, function(err, rows, fields) {
@@ -91,9 +93,55 @@ app.post('/api/users/add', async (req, res) => {
   });
 })
 
+// 사용자 수정
+// 사용자 삭제
+
 // 모든 게시글 list 조회
-// 특정 게시글 조회
-// 게시글 등록
+app.get('/api/articles', async (req, res) => {
+  maria.query('select * from t_board', function(err, rows, fields) {
+    if(!err){
+      // console.log("succ", rows);
+      res.send(rows);
+    }
+    else {
+      console.log("err : ", err);
+    }
+  });
+})
+
+// 특정 게시글 조회 (GET)
+app.get('/api/articles/:id', async (req, res) => {
+  const { id } = req.params;
+  const sql = `select * from t_board where id = '${id}'`; // 백틱(`)을 사용하면 문자열 안에 변수를 넣을 수 있음
+  maria.query(sql, function(err, rows, fields) {
+    if(!err){
+      // console.log("succ", rows);
+      res.send(rows[0]);
+    }
+    else {
+      console.log("err : ", err);
+    }
+  });
+})
+
+// 게시글 등록(POST)
+app.post('/api/articles/add', async (req, res) => {
+  // console.log('/api/articles/add :>> ', req.body);
+  const {type, title, contents, username} = req.body
+  const sql = 'INSERT INTO t_board (type, title, contents, writer, created_at, updated_at) VALUES(?, ?, ?, ?, now(), now())';
+  const params = [type, title, contents, username];
+
+  maria.query(sql, params, function(err, rows, fields) {
+    if(!err){
+      console.log("succ", rows);
+      res.send({ok: true});
+    }
+    else {
+      console.log("err : ", err);
+    }
+  });
+})
+
 // 게시글 수정
 // 게시글 삭제
 
